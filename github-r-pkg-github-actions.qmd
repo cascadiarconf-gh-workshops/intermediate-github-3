@@ -1,0 +1,163 @@
+---
+title: "Intermediate GitHub for R Users"
+subtitle: "Part 3: Automating Quarto `pkgdown` Publishing with GitHub Actions"
+format:
+  revealjs:
+    self-contained: true
+output-file: index.html
+---
+
+## Workshop Goals {.smaller}
+
+In **part 1** we:
+
+- Learned how **R scripts** can be shared **directly from GitHub**
+- Created a simple **R package** and **installed from GitHub**
+
+In **part 2**, we:
+
+- Created a **quarto site** for our R package
+- Deployed our Quarto site **on GitHub pages**
+
+Finally, in **part 3**, we will:
+
+- Use **GitHub Actions** to automate the building of our `pkgdown` site when we update our R package
+- Enjoy sweet success (hopefully)
+
+## What *Won’t* Be Covered
+
+Reminder: We are focusing on **Github**, not the intricacies or R code development, git, or other tools.
+
+<br>
+
+We may gloss over important R package details `(debatable)` for the sake of the dopamine reward of automation doing our tedius work for us.
+
+<br>
+
+> **Reminder:** Help each other, pair up, group up as needed.
+
+------------------------------------------------------------------------
+
+## Primary Resources {.smaller}
+
+#### Previously
+
+- [Happy Git With R](https://happygitwithr.com/)
+- [R Packages (2e)](https://r-pkgs.org/)
+- [Rtools for R pkg developers (for windows)](https://cran.r-project.org/bin/windows/Rtools/)
+- Xcode developer tools for R pkg developers (for macOS) –<br>
+`sudo xcode-select --install`
+- [pkgdown + GitHub Pages](https://pkgdown.r-lib.org/articles/pkgdown.html#github-pages)
+- [Quarto website reference](https://quarto.org/docs/reference/projects/websites.html)
+
+And now:
+
+- [GitHub Actions documentation](https://docs.github.com/en/actions)
+
+# Automating Publishing for Our Quarto-based R Package Site
+Using GitHub Actions
+
+## 1. What are GitHub Actions?
+
+<br>
+
+GitHub’s built-in [automation system](https://docs.github.com/en/actions)
+
+    and nearly identical to Microsoft's Azure Pipelines
+
+'Workflows' as [`YAML`](https://docs.github.com/en/actions/writing-workflows/workflow-syntax-for-github-actions) files
+
+    stored in .github/workflows/ folder in repo
+
+Can be triggered by
+
+    pushes, PRs, schedules, manual runs, etc.
+
+Let’s automate `pkgdown::build_site()` on push!
+
+---
+
+### 2. Set It Up with `usethis`
+
+<br>
+
+Open your R package project (or you can use the [Part 3 template](https://github.com/cascadiarconf-gh-workshops/intermediate-github-3-pkg-template)). We'll run:
+
+```r
+usethis::use_github_action("pkgdown")
+```
+
+<br>
+
+- [usethis::use_github_action](https://usethis.r-lib.org/reference/use_github_action.html)
+- Adds an Actions workflow folder + `YAML` file to your repo
+- Builds the site and pushes site files to `gh-pages` branch instead of `main`
+
+---
+
+### 3. GitHub Pages Settings Check
+
+<br>
+
+- Settings → Pages
+- Source should be set to `gh-pages` branch (not `/docs` now)
+- We'll also want to update our .gitignore to re-include the `docs` folder. We don't need it in our source repository anymore! Delete the docs folder.
+
+---
+
+### 4. Check the GitHub Actions Tab
+
+<br>
+
+- Go to the "Actions" tab in your repo
+- Look for a workflow run titled “Pkgdown”
+- Click through to see logs and output
+
+---
+
+### 5. Modify the Workflow (Optional)
+
+- Let's ensure each deployment is "clean"
+- Edit `.github/workflows/pkgdown.yaml`:
+
+  ```yaml
+        with:
+          clean: true
+  ```
+  
+- If you don’t use `clean: true` in the deploy action, it will add or update files, but not remove files that were deleted in your source. This can lead to lingering old content.
+
+---
+
+### 6. Bask in Automated Glory
+
+- Push your changes (and merge to `main`), and your site updates itself
+- No more `pkgdown::build_site()` + committing `docs/` each time you want to update your website documentation for your package
+
+---
+
+## Wrap-Up {.smaller}
+
+::: {.incremental}
+- `pkgdown` allows us to quickly build an appealing interface for our pkg docs
+- GitHub lets you host a public website for free, built from your repo files
+- GitHub Actions make it **automatic and reproducible**
+- Bonus: You can use similar patterns and templates across any R project!
+
+<br>
+
+- See my final pkg from testing this workshop: <br> [SkylerElmstrom/sre-testpkg](https://github.com/SkylerElmstrom/sre-testpkg)
+- You can also peruse the Quarto + GH Actions + GH Pages at work for the Basics workshop: <br> [cascadiarconf-gh-workshops/GutHub](https://github.com/cascadiarconf-gh-workshops/GutHub)
+:::
+
+---
+
+## Resources
+
+- Happy Git With R – [https://happygitwithr.com/](https://happygitwithr.com/)
+- R Packages (2e) – [https://r-pkgs.org/](https://r-pkgs.org/)
+- Rtools for R pkg developers (Windows) – [https://cran.r-project.org/bin/windows/Rtools/](https://cran.r-project.org/bin/windows/Rtools/)
+- Xcode developer tools (macOS) – `xcode-select --install`
+- [pkgdown + GitHub Pages](https://pkgdown.r-lib.org/articles/pkgdown.html#github-pages)
+- [Quarto Website Reference](https://quarto.org/docs/reference/projects/websites.html)
+- [GitHub Actions Documentation](https://docs.github.com/en/actions)
